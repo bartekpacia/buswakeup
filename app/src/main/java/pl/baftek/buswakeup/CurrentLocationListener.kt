@@ -9,7 +9,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-s
+
 @SuppressLint("MissingPermission")
 class CurrentLocationListener private constructor(appContext: Context) : LiveData<Location>() {
 

@@ -12,5 +12,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         buttonMap.setOnClickListener { startActivity(Intent(this, MapsActivity::class.java)) }
+        buttonStartService.setOnClickListener {
+            val input = editText.text.toString()
+
+            val intent = Intent(this, LocationService::class.java)
+            intent.putExtra("input", input)
+            startService(intent)
+        }
+        buttonStopService.setOnClickListener {
+            val intent = Intent(this, LocationService::class.java)
+            stopService(intent)
+        }
     }
 }
