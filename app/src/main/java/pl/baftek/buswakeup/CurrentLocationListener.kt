@@ -3,6 +3,7 @@ package pl.baftek.buswakeup
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -12,23 +13,32 @@ import com.google.android.gms.location.LocationServices
 
 @SuppressLint("MissingPermission")
 class CurrentLocationListener private constructor(appContext: Context) : LiveData<Location>() {
+    private val TAG = "LocationListener"
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
-    val locationRequest = LocationRequest.create()
-            .setInterval(5000)
+    private val locationRequest = LocationRequest.create()
+            .setInterval(3000)
             .setPriority(PRIORITY_HIGH_ACCURACY)
 
-    init {
-        fusedLocationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult?) {
-                super.onLocationResult(result)
-                value = result?.lastLocation
-            }
-        }, null)
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult?) {
+            Log.d(TAG, "locationCallback ${result?.lastLocation.toString()}")
+            value = result?.lastLocation
+        }
+    }
+
+    override fun onActive() {
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        Log.d(TAG, "onActive")
+    }
+
+    override fun onInactive() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        Log.d(TAG, "onInactive")
     }
 
     companion object {
-        var instance: CurrentLocationListener? = null
+        private var instance: CurrentLocationListener? = null
 
         fun getInstance(appContext: Context): CurrentLocationListener {
             if (instance == null) instance = CurrentLocationListener(appContext)

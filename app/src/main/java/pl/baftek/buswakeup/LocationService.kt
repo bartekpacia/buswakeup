@@ -7,6 +7,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 class LocationService : Service() {
+    private val TAG = "LocationService"
 
     override fun onCreate() {
         super.onCreate()
