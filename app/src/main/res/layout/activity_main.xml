@@ -7,33 +7,6 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/buttonStartService"
-        android:text="Uruchom serwis"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:textColor="@android:color/white"
-        app:layout_constraintVertical_bias="0.13999999"
-        app:layout_constraintHorizontal_bias="0.501" />
-
-    <Button
-        android:id="@+id/buttonStopService"
-        android:text="Zatrzymaj serwis"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="@color/colorPrimary"
-        android:textColor="@android:color/white"
-        app:layout_constraintVertical_bias="0.25" />
-
-    <Button
         android:id="@+id/buttonMap"
         android:text="@string/open_map"
         android:layout_width="wrap_content"
@@ -65,36 +38,20 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        android:layout_width="0dp"
+    <Switch
+        android:id="@+id/serviceSwitch"
+        android:text="Śledzenie lokalizacji"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:hint="Przykładowy tekst">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <TextView
-        android:id="@+id/textLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="N 50 E 18"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:switchPadding="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toTopOf="@+id/textInputLayout"
-        app:layout_constraintVertical_bias="0.75" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
