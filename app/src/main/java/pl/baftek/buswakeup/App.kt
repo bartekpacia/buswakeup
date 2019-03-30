@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import pl.baftek.buswakeup.data.AppDatabase
 
 class App : Application() {
 
@@ -12,6 +13,7 @@ class App : Application() {
         super.onCreate()
 
         createNotificationChannel()
+        AppDatabase.getInstance(applicationContext)
     }
 
     private fun createNotificationChannel() {
