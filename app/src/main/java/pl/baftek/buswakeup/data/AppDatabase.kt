@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import pl.baftek.buswakeup.DATABASE_NAME
+import pl.baftek.buswakeup.start
 
 @Database(entities = [Destination::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -14,16 +15,27 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         @Volatile private var instance: AppDatabase? = null
 
+        @Synchronized
         fun getInstance(context: Context): AppDatabase {
-            return instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also { instance = it }
+            if (instance == null) {
+                instance = buildDatabase(context)
+                (instance as AppDatabase).populateInitialData()
             }
+            return instance as AppDatabase
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                     .allowMainThreadQueries()
                     .build()
+        }
+    }
+
+    private fun populateInitialData() {
+        if (this.destinationDao().getDestination() == null) {
+            val destination = Destination(System.nanoTime(), start.latitude, start.longitude)
+
+            this.destinationDao().insertDestination(destination)
         }
     }
 }

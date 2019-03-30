@@ -32,6 +32,7 @@ class CurrentLocationListener private constructor(appContext: Context) : LiveDat
             val array = FloatArray(1)
 
             val destination = AppDatabase.getInstance(appContext).destinationDao().getDestination()
+            Log.d(TAG, destination.toString())
 
             // TODO Fix - unsafe code
             userLocation?.let {
@@ -45,7 +46,7 @@ class CurrentLocationListener private constructor(appContext: Context) : LiveDat
             }
 
             //if(array[0] > THRESHOLD)
-            Toast.makeText(appContext, "Distance from destination: ${array[0]} m", Toast.LENGTH_SHORT).show()
+            Toast.makeText(appContext, "Distance from destination: ${array[0]} m\nlat: ${destination!!.lat}, long: ${destination.long}", Toast.LENGTH_SHORT).show()
         }
     }
 

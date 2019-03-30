@@ -2,6 +2,7 @@ package pl.baftek.buswakeup
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -16,27 +17,17 @@ import pl.baftek.buswakeup.data.Destination
 
 @SuppressWarnings("MissingPermission")
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+    private val TAG = "MapsActivity"
 
     private lateinit var map: GoogleMap
-    private val start = LatLng(50.098915, 18.551711)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        if (AppDatabase.getInstance(this).destinationDao().getDestination() == null) {
-            AppDatabase.getInstance(this).destinationDao().insertDestination(Destination(System.nanoTime(), start.latitude, start.longitude))
-        }
-
         val serviceIntent = Intent(this, LocationService::class.java)
 
-        serviceSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                startService(serviceIntent)
-            } else {
-                stopService(serviceIntent)
-            }
-        }
+        buttonService.setOnClickListener { startService(serviceIntent) }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -52,9 +43,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.moveCamera(CameraUpdateFactory.newLatLng(start))
 
         map.setOnMapClickListener { latLng ->
-            AppDatabase.getInstance(this).destinationDao().insertDestination(Destination(System.nanoTime(), lat = latLng.latitude, long = latLng.longitude))
             marker.position = latLng
-            Toast.makeText(this, latLng.toString(), Toast.LENGTH_SHORT).show()
+            val destination = Destination(System.nanoTime(), lat = latLng.latitude, long = latLng.longitude)
+            Log.d(TAG, destination.toString())
+
+
+            AppDatabase.getInstance(this).destinationDao().insertDestination(destination)
+            Toast.makeText(this, "lat: ${latLng.latitude}, long: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
         }
     }
 
