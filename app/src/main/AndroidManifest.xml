@@ -18,8 +18,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <service android:name=".LocationService" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".MapsActivity"
+            android:label="@string/map"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,15 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".LocationService" />
-
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/map"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
 
     </application>
 

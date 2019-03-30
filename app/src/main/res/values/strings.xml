@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">bus-wake-up</string>
-    <string name="build">build 5</string>
+    <string name="build">build 6</string>
     <string name="created_by">stworzył @bartekpacia</string>
     <string name="map">Mapa</string>
     <string name="open_map">Otwórz mapę</string>
     <string name="location_service_channel_name">Serwis śledzenie lokalizacji</string>
+    <string name="turn_off">Wyłącz</string>
 </resources>
