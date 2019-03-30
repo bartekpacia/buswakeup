@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/serviceSwitch" />
+        app:layout_constraintBottom_toTopOf="@+id/buttonService" />
 
     <TextView
         android:id="@+id/textBuild"
@@ -39,8 +39,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp" />
 
-    <Switch
-        android:id="@+id/serviceSwitch"
+    <Button
+        android:id="@+id/buttonService"
         android:text="Śledzenie lokalizacji"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
