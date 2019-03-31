@@ -8,6 +8,7 @@ import androidx.room.Query
 @Dao
 interface DestinationDao {
 
+    // Get the newest destination
     @Query("SELECT * FROM destinations WHERE timestamp = (SELECT MAX(timestamp) FROM destinations)")
     fun getDestination(): Destination?
 

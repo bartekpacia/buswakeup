@@ -9,7 +9,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
 import pl.baftek.buswakeup.data.AppDatabase
@@ -44,12 +43,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.setOnMapClickListener { latLng ->
             marker.position = latLng
-            val destination = Destination(System.nanoTime(), lat = latLng.latitude, long = latLng.longitude)
+
+            val destination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
             Log.d(TAG, destination.toString())
-
-
             AppDatabase.getInstance(this).destinationDao().insertDestination(destination)
-            Toast.makeText(this, "lat: ${latLng.latitude}, long: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, AppDatabase.getInstance(this).destinationDao().getDestination().toString())
+            Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
         }
     }
 
