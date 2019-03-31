@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import pl.baftek.buswakeup.data.AppDatabase
+import kotlin.math.roundToInt
 
 @SuppressLint("MissingPermission")
 class CurrentLocationListener private constructor(appContext: Context) : LiveData<Location>() {
@@ -39,14 +40,17 @@ class CurrentLocationListener private constructor(appContext: Context) : LiveDat
                 Location.distanceBetween(
                     it.lastLocation.latitude,
                     it.lastLocation.longitude,
-                    destination!!.lat,
-                    destination.long,
+                    destination!!.latitude,
+                    destination.longitude,
                     array
                 )
             }
 
-            //if(array[0] > THRESHOLD)
-            Toast.makeText(appContext, "Distance from destination: ${array[0]} m\nlat: ${destination!!.lat}, long: ${destination.long}", Toast.LENGTH_SHORT).show()
+            val text = if (array[0] < THRESHOLD) {
+                "You are less than 100 m from the destination!"
+            } else "Distance from destination: ${array[0].roundToInt()} m\nlatitude: ${destination!!.latitude}, longitude: ${destination.longitude}"
+
+            Toast.makeText(appContext, text, Toast.LENGTH_SHORT).show()
         }
     }
 
