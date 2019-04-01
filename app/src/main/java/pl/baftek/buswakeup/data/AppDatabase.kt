@@ -19,6 +19,8 @@ abstract class AppDatabase : RoomDatabase() {
         fun getInstance(context: Context): AppDatabase {
             if (instance == null) {
                 instance = buildDatabase(context)
+            }
+            if ((instance as AppDatabase).destinationDao().getDestination() == null) {
                 (instance as AppDatabase).populateInitialData()
             }
             return instance as AppDatabase
