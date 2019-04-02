@@ -7,4 +7,7 @@
     <string name="location_service_channel_name">Serwis śledzenie lokalizacji</string>
     <string name="turn_off">Wyłącz</string>
     <string name="error_location_permission">Aplikacja wymaga dostępu do lokalizacji!</string>
+    <string name="location_tracking">Śledzenie lokalizacji</string>
+    <string name="distance_from_destination">Odległość od celu</string>
+    <string name="map_mode">Tryb mapy</string>
 </resources>

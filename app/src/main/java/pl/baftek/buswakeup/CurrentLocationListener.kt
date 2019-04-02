@@ -4,15 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import pl.baftek.buswakeup.data.AppDatabase
-import kotlin.math.roundToInt
 
 @SuppressLint("MissingPermission")
 class CurrentLocationListener private constructor(appContext: Context) : LiveData<Location>() {
@@ -29,28 +26,6 @@ class CurrentLocationListener private constructor(appContext: Context) : LiveDat
         override fun onLocationResult(userLocation: LocationResult?) {
             Log.d(TAG, "locationCallback ${userLocation?.lastLocation.toString()}")
             value = userLocation?.lastLocation
-
-            val array = FloatArray(1)
-
-            val destination = AppDatabase.getInstance(appContext).destinationDao().getDestination()
-            Log.d(TAG, destination.toString())
-
-            // TODO Fix - unsafe code
-            userLocation?.let {
-                Location.distanceBetween(
-                    it.lastLocation.latitude,
-                    it.lastLocation.longitude,
-                    destination!!.latitude,
-                    destination.longitude,
-                    array
-                )
-            }
-
-            val text = if (array[0] < THRESHOLD) {
-                "You are less than 100 m from the destination!"
-            } else "Distance from destination: ${array[0].roundToInt()} m\nlatitude: ${destination!!.latitude}, longitude: ${destination.longitude}"
-
-            Toast.makeText(appContext, text, Toast.LENGTH_SHORT).show()
         }
     }
 
