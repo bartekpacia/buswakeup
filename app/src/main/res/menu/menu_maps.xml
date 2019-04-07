@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/map_mode"
-        android:icon="@drawable/ic_map_black_24dp"
-        android:iconTint="@android:color/white"/>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/map_satellite"
+            android:title="@string/satellite"
+            android:checked="true" />
+
+        <item
+            android:id="@+id/map_normal"
+            android:title="@string/normal" />
+
+        <item
+            android:id="@+id/map_terrain"
+            android:title="@string/terrain" />
+
+        <item
+            android:id="@+id/map_hybrid"
+            android:title="@string/hybrid" />
+
+    </group>
 </menu>

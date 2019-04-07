@@ -14,7 +14,6 @@ import com.google.android.gms.location.LocationServices
 @SuppressLint("MissingPermission")
 class CurrentLocationListener private constructor(appContext: Context) : LiveData<Location>() {
     private val TAG = "LocationListener"
-    private val THRESHOLD = 100
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
     private val locationRequest = LocationRequest.create()

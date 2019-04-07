@@ -70,7 +70,7 @@ class LocationService : Service() {
 
         CurrentLocationListener.getInstance(applicationContext).observeForever(observer)
 
-        startForeground(notificationId, buildNotification(title = "Service started", text = "Waiting for location..."))
+        startForeground(notificationId, buildNotification(title = getString(R.string.location_tracking), text = getString(R.string.waiting_for_location)))
 
         return START_STICKY
     }

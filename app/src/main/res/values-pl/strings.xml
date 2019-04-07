@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BusWaker</string>
+    <string name="version">Wersja</string>
+    <string name="created_by">stworzył @bartekpacia</string>
+    <string name="map">Mapa</string>
+    <string name="open_map">Otwórz mapę</string>
+    <string name="turn_off">Wyłącz</string>
+    <string name="error_location_permission">Aplikacja wymaga dostępu do lokalizacji!</string>
+    <string name="waiting_for_location">Czekanie na lokalizację…</string>
+    <string name="location_tracking">Śledzenie lokalizacji</string>
+    <string name="distance_from_destination">Odległość od celu</string>
+    <string name="map_mode">Tryb mapy</string>
+    <string name="satellite">Satelitarna</string>
+    <string name="normal">Normalna</string>
+    <string name="terrain">Terenowa</string>
+    <string name="hybrid">Hybrydowa</string>
+    <string name="hi">Cześć!</string>
+    <string name="destination">Miejsce docelowe</string>
+    <string name="set_destination">Ustaw miejsce docelowe</string>
+    <string name="have_nice_rest">Miłego odpoczynku!</string>
+    <string name="intro_description_1">Nigdy więcej nie przegap przystanku</string>
+    <string name="intro_description_2">Wskaż na mapie punkt, w którym chcesz się obudzić.</string>
+    <string name="intro_description_3">Aplikacja uruchomi dzwonek, gdy znajdziesz się w pobliżu Twojego celu</string>
+</resources>

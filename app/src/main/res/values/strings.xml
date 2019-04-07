@@ -1,13 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">bus-wake-up</string>
-    <string name="build">build 8</string>
-    <string name="created_by">stworzył @bartekpacia</string>
-    <string name="map">Mapa</string>
-    <string name="open_map">Otwórz mapę</string>
-    <string name="location_service_channel_name">Serwis śledzenie lokalizacji</string>
-    <string name="turn_off">Wyłącz</string>
-    <string name="error_location_permission">Aplikacja wymaga dostępu do lokalizacji!</string>
-    <string name="location_tracking">Śledzenie lokalizacji</string>
-    <string name="distance_from_destination">Odległość od celu</string>
-    <string name="map_mode">Tryb mapy</string>
+    <string name="app_name">BusWaker</string>
+    <string name="version">Version</string>
+    <string name="created_by">created by @bartekpacia</string>
+    <string name="map">Map</string>
+    <string name="open_map">Open map</string>
+    <string name="turn_off">Turn off</string>
+    <string name="error_location_permission">App requires access to location</string>
+    <string name="waiting_for_location">Waiting for location…</string>
+    <string name="location_tracking">Location tracking</string>
+    <string name="distance_from_destination">Distance from destination</string>
+    <string name="map_mode">Map mode</string>
+    <string name="satellite">Satellite</string>
+    <string name="normal">Normal</string>
+    <string name="terrain">Terrain</string>
+    <string name="hybrid">Hybrid</string>
+    <string name="hi">Hi!</string>
+    <string name="destination">Destination</string>
+    <string name="set_destination">Set destination</string>
+    <string name="have_nice_rest">Have a nice rest!</string>
+    <string name="intro_description_1">Never oversleep on the bus again</string>
+    <string name="intro_description_2">Set a destination where you want to wake up</string>
+    <string name="intro_description_3">App will start the ringtone when you are nearby the destination</string>
 </resources>
