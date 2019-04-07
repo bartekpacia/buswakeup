@@ -7,11 +7,13 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -34,6 +36,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         handlePermissions()
 
+        textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
+
         currentDestination = AppDatabase.getInstance(this).destinationDao().getDestination()
         val serviceIntent = Intent(this, LocationService::class.java)
         buttonService.setOnClickListener { startService(serviceIntent) }
@@ -54,7 +58,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         Log.d(TAG, AppDatabase.getInstance(this).destinationDao().getDestination().toString())
 
         map = googleMap
-        map.isMyLocationEnabled = true
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
             LatLng(
                 currentDestination!!.latitude,
@@ -66,7 +69,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             LatLng(
                 currentDestination!!.latitude,
                 currentDestination!!.longitude
-            )).title("Destination"))
+            )).title(getString(R.string.destination)))
 
         map.setOnMapClickListener { latLng ->
             marker.position = latLng
@@ -85,12 +88,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, R.string.error_location_permission, Toast.LENGTH_SHORT).show()
                 finish()
+            } else {
+                map.isMyLocationEnabled = true
             }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        //menuInflater.inflate(menu) //TODO Add menu
+        menuInflater.inflate(R.menu.menu_maps, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val mapType: Int = when (item.itemId) {
+            R.id.map_normal -> MAP_TYPE_NORMAL
+            R.id.map_satellite -> MAP_TYPE_SATELLITE
+            R.id.map_terrain -> MAP_TYPE_TERRAIN
+            R.id.map_hybrid -> MAP_TYPE_HYBRID
+            else -> return super.onOptionsItemSelected(item)
+        }
+
+        map.mapType = mapType
+        item.isChecked = true
+        return true
     }
 }

@@ -20,14 +20,14 @@
         app:layout_constraintBottom_toTopOf="@+id/buttonService" />
 
     <TextView
-        android:id="@+id/textBuild"
+        android:id="@+id/textVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/build" />
+        tools:text="version X.X" />
 
     <TextView
         android:id="@+id/textCreatedBy"
@@ -41,7 +41,7 @@
 
     <Button
         android:id="@+id/buttonService"
-        android:text="Śledzenie lokalizacji"
+        android:text="@string/location_tracking"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
