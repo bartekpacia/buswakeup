@@ -6,6 +6,8 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.location.Location
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.IBinder
@@ -23,10 +25,10 @@ private const val THRESHOLD = 100
 
 class LocationService : Service() {
     private val notificationId = 1
-    private val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
+    private val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
     private lateinit var notificationManager: NotificationManager
-    private lateinit var ringtone: Ringtone
+    private lateinit var mediaPlayer: MediaPlayer
 
     private val observer = Observer<Location> { userLocation ->
         val array = FloatArray(1)
@@ -47,7 +49,8 @@ class LocationService : Service() {
         val distance = "%.2f".format(array[0] / 1000)
 
         val toastText = if (array[0] < THRESHOLD) {
-            if (!ringtone.isPlaying) ringtone.play()
+            //if (!ringtone.isPlaying)
+            if (!mediaPlayer.isPlaying) mediaPlayer.start()
 
             "You are less than $THRESHOLD m from the destination!"
         } else "${getString(R.string.distance_from_destination)} $distance: km"
@@ -61,7 +64,12 @@ class LocationService : Service() {
 
     override fun onCreate() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        ringtone = RingtoneManager.getRingtone(this, ringtoneUri)
+
+        mediaPlayer = MediaPlayer()
+        mediaPlayer.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
+        mediaPlayer.setDataSource(this, ringtoneUri)
+        mediaPlayer.prepare()
+
         super.onCreate()
     }
 
@@ -95,7 +103,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         CurrentLocationListener.getInstance(applicationContext).removeObserver(observer)
-        ringtone.stop()
+        mediaPlayer.stop()
         Log.d(TAG, "Service destroyed")
 
         super.onDestroy()
