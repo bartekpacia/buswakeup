@@ -34,7 +34,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        handlePermissions()
 
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
@@ -51,13 +50,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), RC_PERMISSION_LOCATION)
             }
+        } else {
+            map.isMyLocationEnabled = true
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.d(TAG, AppDatabase.getInstance(this).destinationDao().getDestination().toString())
-
         map = googleMap
+
+        handlePermissions()
+
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
             LatLng(
                 currentDestination!!.latitude,

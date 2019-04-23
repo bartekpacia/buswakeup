@@ -8,9 +8,11 @@ import android.content.Intent
 import android.location.Location
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.Ringtone
 import android.media.RingtoneManager
+import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -27,7 +29,9 @@ class LocationService : Service() {
     private val notificationId = 1
 
     private val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
     private lateinit var notificationManager: NotificationManager
+    private lateinit var vibrator: Vibrator
     private lateinit var mediaPlayer: MediaPlayer
 
     private val observer = Observer<Location> { userLocation ->
@@ -49,8 +53,14 @@ class LocationService : Service() {
         val distance = "%.2f".format(array[0] / 1000)
 
         val toastText = if (array[0] < THRESHOLD) {
-            //if (!ringtone.isPlaying)
             if (!mediaPlayer.isPlaying) mediaPlayer.start()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val timings = longArrayOf(500, 500)
+                vibrator.vibrate(VibrationEffect.createWaveform(timings, 0))
+            } else {
+                val pattern = longArrayOf(500, 500)
+                vibrator.vibrate(pattern, 0)
+            }
 
             "You are less than $THRESHOLD m from the destination!"
         } else "${getString(R.string.distance_from_destination)} $distance: km"
@@ -64,6 +74,7 @@ class LocationService : Service() {
 
     override fun onCreate() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         mediaPlayer = MediaPlayer()
         mediaPlayer.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
@@ -104,6 +115,7 @@ class LocationService : Service() {
     override fun onDestroy() {
         CurrentLocationListener.getInstance(applicationContext).removeObserver(observer)
         mediaPlayer.stop()
+        vibrator.cancel()
         Log.d(TAG, "Service destroyed")
 
         super.onDestroy()
