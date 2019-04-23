@@ -25,6 +25,7 @@ import pl.baftek.buswakeup.data.Destination
 private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
 
+// TODO Fix: user's location not showing
 @SuppressWarnings("MissingPermission")
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
