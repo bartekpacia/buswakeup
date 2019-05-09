@@ -107,7 +107,7 @@ class LocationService : Service() {
     }
 
     override fun onDestroy() {
-        CurrentLocationListener.getInstance(applicationContext).removeObserver(observer)
+        CurrentLocationListener.getInstance(applicationContext).removeObserver(observer) // Maybe observers aren't 'deactivated'?
         mediaPlayer.stop()
         vibrator.cancel()
         Log.d(TAG, "Service destroyed")
