@@ -17,8 +17,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
+import com.google.android.gms.maps.model.LatLng
 import pl.baftek.buswakeup.data.AppDatabase
 import pl.baftek.buswakeup.data.Destination
+import pl.baftek.buswakeup.dsl.distanceFrom
 
 private const val TAG = "LocationService"
 private const val ACTION_STOP_SERVICE = "stop_service"
@@ -35,24 +37,16 @@ class LocationService : Service() {
     private lateinit var mediaPlayer: MediaPlayer
 
     private val observer = Observer<Location> { userLocation ->
-        val array = FloatArray(1)
+        if(userLocation == null) return@Observer
 
         /** Won't be null (look at [AppDatabase.populateInitialData]**/
         val destination = AppDatabase.getInstance(this).destinationDao().getDestination() as Destination
         Log.d(TAG, destination.toString())
 
-        userLocation?.let {
-            Location.distanceBetween(
-                it.latitude,
-                it.longitude,
-                destination.latitude,
-                destination.longitude,
-                array
-            )
-        }
-        val distance = "%.2f".format(array[0] / 1000)
+        val distance = userLocation.distanceFrom(LatLng(destination.latitude, destination.longitude))
+        val dsitanceString = "%.2f".format(distance)
 
-        val toastText = if (array[0] < THRESHOLD) {
+        val toastText = if (distance < THRESHOLD) {
             if (!mediaPlayer.isPlaying) mediaPlayer.start()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val timings = longArrayOf(500, 500)
@@ -63,11 +57,11 @@ class LocationService : Service() {
             }
 
             "You are less than $THRESHOLD m from the destination!"
-        } else "${getString(R.string.distance_from_destination)} $distance: km"
+        } else "${getString(R.string.distance_from_destination)} $dsitanceString: km"
 
         Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show()
 
-        val text = "${getString(R.string.distance_from_destination)} $distance: km"
+        val text = "${getString(R.string.distance_from_destination)} $dsitanceString: km"
         val notification = buildNotification(getString(R.string.location_tracking), text)
         notificationManager.notify(notificationId, notification)
     }
