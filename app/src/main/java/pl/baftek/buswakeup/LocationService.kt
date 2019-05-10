@@ -25,7 +25,7 @@ import pl.baftek.buswakeup.dsl.distanceFrom
 private const val TAG = "LocationService"
 private const val ACTION_STOP_SERVICE = "stop_service"
 // TODO Let user change the threshold
-private const val THRESHOLD = 100
+private const val THRESHOLD = 0.1 // in kilometers
 
 class LocationService : Service() {
     private val notificationId = 1
@@ -44,7 +44,8 @@ class LocationService : Service() {
         Log.d(TAG, destination.toString())
 
         val distance = userLocation.distanceFrom(LatLng(destination.latitude, destination.longitude))
-        val dsitanceString = "%.2f".format(distance)
+        Log.d(TAG, "distance: $distance")
+        val distanceString = "%.2f".format(distance)
 
         val toastText = if (distance < THRESHOLD) {
             if (!mediaPlayer.isPlaying) mediaPlayer.start()
@@ -57,11 +58,11 @@ class LocationService : Service() {
             }
 
             "You are less than $THRESHOLD m from the destination!"
-        } else "${getString(R.string.distance_from_destination)} $dsitanceString: km"
+        } else "${getString(R.string.distance_from_destination)} $distanceString: km"
 
         Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show()
 
-        val text = "${getString(R.string.distance_from_destination)} $dsitanceString: km"
+        val text = "${getString(R.string.distance_from_destination)} $distanceString: km"
         val notification = buildNotification(getString(R.string.location_tracking), text)
         notificationManager.notify(notificationId, notification)
     }
