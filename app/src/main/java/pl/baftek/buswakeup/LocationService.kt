@@ -20,6 +20,7 @@ import androidx.lifecycle.Observer
 import com.google.android.gms.maps.model.LatLng
 import pl.baftek.buswakeup.data.AppDatabase
 import pl.baftek.buswakeup.data.Destination
+import pl.baftek.buswakeup.dsl.db
 import pl.baftek.buswakeup.dsl.distanceFrom
 
 private const val TAG = "LocationService"
@@ -40,7 +41,7 @@ class LocationService : Service() {
         if(userLocation == null) return@Observer
 
         /** Won't be null (look at [AppDatabase.populateInitialData]**/
-        val destination = AppDatabase.getInstance(this).destinationDao().getDestination() as Destination
+        val destination = db().destinationDao().getDestination() as Destination
         Log.d(TAG, destination.toString())
 
         val distance = userLocation.distanceFrom(LatLng(destination.latitude, destination.longitude))
@@ -57,7 +58,7 @@ class LocationService : Service() {
                 vibrator.vibrate(pattern, 0)
             }
 
-            "You are less than $THRESHOLD m from the destination!"
+            "You are less than $THRESHOLD km from the destination!"
         } else "${getString(R.string.distance_from_destination)} $distanceString: km"
 
         Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show()
