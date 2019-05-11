@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
 import pl.baftek.buswakeup.data.AppDatabase
 import pl.baftek.buswakeup.data.Destination
+import pl.baftek.buswakeup.dsl.db
 
 private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
@@ -37,7 +38,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
-        currentDestination = AppDatabase.getInstance(this).destinationDao().getDestination()
+        currentDestination = db().destinationDao().getDestination()
         val serviceIntent = Intent(this, LocationService::class.java)
         buttonService.setOnClickListener { startService(serviceIntent) }
 
@@ -78,7 +79,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
             Log.d(TAG, newDestination.toString())
-            AppDatabase.getInstance(this).destinationDao().insertDestination(newDestination)
+
+            db().destinationDao().insertDestination(newDestination)
+
             Log.d(TAG, currentDestination.toString())
             Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
         }
