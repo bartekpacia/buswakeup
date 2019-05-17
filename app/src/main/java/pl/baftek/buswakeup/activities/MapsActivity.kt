@@ -17,16 +17,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import pl.baftek.buswakeup.BuildConfig
 import pl.baftek.buswakeup.LocationService
 import pl.baftek.buswakeup.R
 import pl.baftek.buswakeup.data.Destination
 import pl.baftek.buswakeup.dsl.db
-import java.util.*
 
 private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
@@ -36,8 +33,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private lateinit var currentDestination: Destination
-    private lateinit var marker: MarkerOptions
-    private lateinit var circle: CircleOptions
+    private lateinit var marker: Marker
+    private lateinit var circle: Circle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,16 +47,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         buttonService.setOnClickListener {
             startService(serviceIntent)
         }
-
-        marker = MarkerOptions()
-                .position(LatLng(currentDestination.latitude, currentDestination.longitude))
-                .title(getString(R.string.destination))
-
-        circle = CircleOptions()
-                .center(marker.position)
-                .radius(100.0)
-                .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        buttonLess.setOnClickListener {
+            if (circle.radius >= 50) circle.radius -= 10
+        }
+        buttonMore.setOnClickListener {
+            circle.radius += 10
+        }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -90,11 +83,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             map.clear()
 
             // Add a marker
-            val marker = map.addMarker(MarkerOptions()
+            marker = map.addMarker(MarkerOptions()
                     .position(latLng)
                     .title(getString(R.string.destination)))
 
-            val circle = map.addCircle(CircleOptions()
+            circle = map.addCircle(CircleOptions()
                     .center(latLng)
                     .radius(100.0)
                     .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
