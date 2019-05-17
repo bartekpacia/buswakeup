@@ -35,6 +35,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var currentDestination: Destination
     private lateinit var currentLatLng: LatLng
 
+    private var currentRadius: Double = 100.0
+
     // Initialized in onMapReady()
     private lateinit var marker: Marker
     private lateinit var circle: Circle
@@ -47,6 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
         currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+        currentRadius = currentDestination.radius
         val serviceIntent = Intent(this, LocationService::class.java)
         buttonService.setOnClickListener {
             startService(serviceIntent)
@@ -85,13 +88,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             12f))
 
         map.setOnMapClickListener { latLng ->
-            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
+            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude, radius = circle.radius)
             Log.d(TAG, newDestination.toString())
 
             db().destinationDao().insertDestination(newDestination)
 
             currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
             currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+            currentRadius = circle.radius
 
             Log.d(TAG, currentDestination.toString())
             Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
@@ -110,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         circle = map.addCircle(CircleOptions()
                 .center(currentLatLng)
-                .radius(100.0)
+                .radius(currentRadius)
                 .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
     }
