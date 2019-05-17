@@ -33,6 +33,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private lateinit var currentDestination: Destination
+    private lateinit var currentLatLng: LatLng
+
+    // Initialized in onMapReady()
     private lateinit var marker: Marker
     private lateinit var circle: Circle
 
@@ -43,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
         currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
+        currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
         val serviceIntent = Intent(this, LocationService::class.java)
         buttonService.setOnClickListener {
             startService(serviceIntent)
@@ -70,8 +74,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
         handlePermissions()
+
+        updateMap()
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
             LatLng(
@@ -80,27 +85,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             12f))
 
         map.setOnMapClickListener { latLng ->
-            map.clear()
-
-            // Add a marker
-            marker = map.addMarker(MarkerOptions()
-                    .position(latLng)
-                    .title(getString(R.string.destination)))
-
-            circle = map.addCircle(CircleOptions()
-                    .center(latLng)
-                    .radius(100.0)
-                    .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                    .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
-
             val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
             Log.d(TAG, newDestination.toString())
 
             db().destinationDao().insertDestination(newDestination)
 
+            currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
+            currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+
             Log.d(TAG, currentDestination.toString())
             Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
+
+            updateMap()
         }
+    }
+
+    private fun updateMap() {
+        map.clear()
+
+        // Add a marker
+        marker = map.addMarker(MarkerOptions()
+                .position(currentLatLng)
+                .title(getString(R.string.destination)))
+
+        circle = map.addCircle(CircleOptions()
+                .center(currentLatLng)
+                .radius(100.0)
+                .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

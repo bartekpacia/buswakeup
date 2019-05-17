@@ -52,7 +52,7 @@
 
     <Button
         android:id="@+id/buttonLess"
-        android:text="+"
+        android:text="-"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:insetTop="6dp"
@@ -64,7 +64,7 @@
 
     <Button
         android:id="@+id/buttonMore"
-        android:text="-"
+        android:text="+"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
