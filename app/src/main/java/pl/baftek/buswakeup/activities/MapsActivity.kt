@@ -11,11 +11,13 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
@@ -69,15 +71,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 currentDestination!!.longitude),
             12f))
 
-        // Add a marker
-        val marker = map.addMarker(MarkerOptions().position(
-            LatLng(
-                currentDestination!!.latitude,
-                currentDestination!!.longitude
-            )).title(getString(R.string.destination)))
-
         map.setOnMapClickListener { latLng ->
-            marker.position = latLng
+            map.clear()
+
+            // Add a marker
+            val marker = map.addMarker(MarkerOptions()
+                    .position(latLng)
+                    .title(getString(R.string.destination)))
+
+            val circle = map.addCircle(CircleOptions()
+                    .center(latLng)
+                    .radius(100.0)
+                    .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                    .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
 
             val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
             Log.d(TAG, newDestination.toString())
