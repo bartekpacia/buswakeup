@@ -26,6 +26,7 @@ import pl.baftek.buswakeup.LocationService
 import pl.baftek.buswakeup.R
 import pl.baftek.buswakeup.data.Destination
 import pl.baftek.buswakeup.dsl.db
+import java.util.*
 
 private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
@@ -34,7 +35,9 @@ private const val RC_PERMISSION_LOCATION = 9001
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
-    private var currentDestination: Destination? = null
+    private lateinit var currentDestination: Destination
+    private lateinit var marker: MarkerOptions
+    private lateinit var circle: CircleOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +45,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
-        currentDestination = db().destinationDao().getDestination()
+        currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
         val serviceIntent = Intent(this, LocationService::class.java)
-        buttonService.setOnClickListener { startService(serviceIntent) }
+        buttonService.setOnClickListener {
+            startService(serviceIntent)
+        }
+
+        marker = MarkerOptions()
+                .position(LatLng(currentDestination.latitude, currentDestination.longitude))
+                .title(getString(R.string.destination))
+
+        circle = CircleOptions()
+                .center(marker.position)
+                .radius(100.0)
+                .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -67,8 +82,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
             LatLng(
-                currentDestination!!.latitude,
-                currentDestination!!.longitude),
+                currentDestination.latitude,
+                currentDestination.longitude),
             12f))
 
         map.setOnMapClickListener { latLng ->
