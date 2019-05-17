@@ -1,4 +1,4 @@
-package pl.baftek.buswakeup
+package pl.baftek.buswakeup.activities
 
 import android.Manifest
 import android.content.Intent
@@ -19,7 +19,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
-import pl.baftek.buswakeup.data.AppDatabase
+import pl.baftek.buswakeup.BuildConfig
+import pl.baftek.buswakeup.LocationService
+import pl.baftek.buswakeup.R
 import pl.baftek.buswakeup.data.Destination
 import pl.baftek.buswakeup.dsl.db
 

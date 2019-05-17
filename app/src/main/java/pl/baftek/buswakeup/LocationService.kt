@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.model.LatLng
+import pl.baftek.buswakeup.activities.MapsActivity
 import pl.baftek.buswakeup.data.AppDatabase
 import pl.baftek.buswakeup.data.Destination
 import pl.baftek.buswakeup.dsl.db

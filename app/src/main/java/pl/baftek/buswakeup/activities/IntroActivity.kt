@@ -1,4 +1,4 @@
-package pl.baftek.buswakeup
+package pl.baftek.buswakeup.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
 import com.github.paolorotolo.appintro.AppIntroFragment
 import com.github.paolorotolo.appintro.model.SliderPage
+import pl.baftek.buswakeup.R
 
 class IntroActivity : AppIntro() {
 

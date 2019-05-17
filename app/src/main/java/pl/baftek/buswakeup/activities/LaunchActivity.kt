@@ -1,10 +1,12 @@
-package pl.baftek.buswakeup
+package pl.baftek.buswakeup.activities
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.edit
+import pl.baftek.buswakeup.PREFS_KEY_INTRO
+import pl.baftek.buswakeup.PREFS_NAME
 
 class LaunchActivity : AppCompatActivity() {
 
