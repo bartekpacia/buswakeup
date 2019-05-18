@@ -11,13 +11,13 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import pl.baftek.buswakeup.BuildConfig
 import pl.baftek.buswakeup.LocationService
@@ -32,7 +32,14 @@ private const val RC_PERMISSION_LOCATION = 9001
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
-    private var currentDestination: Destination? = null
+    private lateinit var currentDestination: Destination
+    private lateinit var currentLatLng: LatLng
+
+    private var currentRadius: Double = 100.0
+
+    // Initialized in onMapReady()
+    private lateinit var marker: Marker
+    private lateinit var circle: Circle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +47,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
-        currentDestination = db().destinationDao().getDestination()
+        currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
+        currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+        currentRadius = currentDestination.radius
         val serviceIntent = Intent(this, LocationService::class.java)
-        buttonService.setOnClickListener { startService(serviceIntent) }
+        buttonService.setOnClickListener {
+            startService(serviceIntent)
+        }
+        buttonLess.setOnClickListener {
+            if (circle.radius >= 50) circle.radius -= 10
+        }
+        buttonMore.setOnClickListener {
+            circle.radius += 10
+        }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -60,33 +77,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
         handlePermissions()
+
+        updateMap()
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
             LatLng(
-                currentDestination!!.latitude,
-                currentDestination!!.longitude),
+                currentDestination.latitude,
+                currentDestination.longitude),
             12f))
 
-        // Add a marker
-        val marker = map.addMarker(MarkerOptions().position(
-            LatLng(
-                currentDestination!!.latitude,
-                currentDestination!!.longitude
-            )).title(getString(R.string.destination)))
-
         map.setOnMapClickListener { latLng ->
-            marker.position = latLng
-
-            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude)
+            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude, radius = circle.radius)
             Log.d(TAG, newDestination.toString())
 
             db().destinationDao().insertDestination(newDestination)
 
+            currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
+            currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+            currentRadius = circle.radius
+
             Log.d(TAG, currentDestination.toString())
             Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
+
+            updateMap()
         }
+    }
+
+    private fun updateMap() {
+        map.clear()
+
+        // Add a marker
+        marker = map.addMarker(MarkerOptions()
+                .position(currentLatLng)
+                .title(getString(R.string.destination)))
+
+        circle = map.addCircle(CircleOptions()
+                .center(currentLatLng)
+                .radius(currentRadius)
+                .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
