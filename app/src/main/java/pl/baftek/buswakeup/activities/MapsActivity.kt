@@ -48,7 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
         currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
-        currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+        currentLatLng = currentDestination.position
         currentRadius = currentDestination.radius
         val serviceIntent = Intent(this, LocationService::class.java)
         buttonService.setOnClickListener {
@@ -81,20 +81,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         updateMap()
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-            LatLng(
-                currentDestination.latitude,
-                currentDestination.longitude),
-            12f))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentDestination.position, 12f))
 
         map.setOnMapClickListener { latLng ->
-            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude, radius = circle.radius)
+            val newDestination = Destination(System.nanoTime(), position = latLng, radius = circle.radius)
             Log.d(TAG, newDestination.toString())
 
             db().destinationDao().insertDestination(newDestination)
 
             currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
-            currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
+            currentLatLng = currentDestination.position
             currentRadius = circle.radius
 
             Log.d(TAG, currentDestination.toString())

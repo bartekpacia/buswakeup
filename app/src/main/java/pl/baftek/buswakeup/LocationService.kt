@@ -45,7 +45,7 @@ class LocationService : Service() {
         val destination = db().destinationDao().getDestination() as Destination
         Log.d(TAG, destination.toString())
 
-        val distance = userLocation.distanceFrom(LatLng(destination.latitude, destination.longitude))
+        val distance = userLocation.distanceFrom(destination.position)
         Log.d(TAG, "distance: $distance")
         val distanceString = "%.2f".format(distance)
 
