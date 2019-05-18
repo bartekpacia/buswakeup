@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import pl.baftek.buswakeup.DATABASE_NAME
-import pl.baftek.buswakeup.start
+import pl.baftek.buswakeup.DEFAULT_POSITION
+import pl.baftek.buswakeup.DEFAULT_RADIUS
 
 @Database(entities = [Destination::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun destinationDao(): DestinationDao
@@ -29,13 +32,14 @@ abstract class AppDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                     .allowMainThreadQueries()
+                    .fallbackToDestructiveMigration()
                     .build()
         }
     }
 
     private fun populateInitialData() {
         if (this.destinationDao().getDestination() == null) {
-            val destination = Destination(System.nanoTime(), start.latitude, start.longitude)
+            val destination = Destination(System.nanoTime(), DEFAULT_POSITION, radius = DEFAULT_RADIUS)
 
             this.destinationDao().insertDestination(destination)
         }

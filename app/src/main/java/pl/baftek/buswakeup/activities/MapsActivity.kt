@@ -12,13 +12,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
+import org.jetbrains.anko.toast
 import pl.baftek.buswakeup.BuildConfig
 import pl.baftek.buswakeup.LocationService
 import pl.baftek.buswakeup.R
@@ -32,34 +37,28 @@ private const val RC_PERMISSION_LOCATION = 9001
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
-    private lateinit var currentDestination: Destination
-    private lateinit var currentLatLng: LatLng
-
-    private var currentRadius: Double = 100.0
+    private lateinit var destination: Destination
 
     // Initialized in onMapReady()
     private lateinit var marker: Marker
     private lateinit var circle: Circle
 
+    private var firstRun = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
+        db().destinationDao().getDestination().observe(this, Observer<Destination> {
+            destination = it
+            updateMap()
+        })
 
-        currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
-        currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
-        currentRadius = currentDestination.radius
         val serviceIntent = Intent(this, LocationService::class.java)
-        buttonService.setOnClickListener {
-            startService(serviceIntent)
-        }
-        buttonLess.setOnClickListener {
-            if (circle.radius >= 50) circle.radius -= 10
-        }
-        buttonMore.setOnClickListener {
-            circle.radius += 10
-        }
+        buttonService.setOnClickListener { startService(serviceIntent) }
+        buttonLess.setOnClickListener { if (circle.radius >= 50) circle.radius -= 10; updateDestination() }
+        buttonMore.setOnClickListener { circle.radius += 10; updateDestination() }
+        textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -79,44 +78,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
         handlePermissions()
 
-        updateMap()
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-            LatLng(
-                currentDestination.latitude,
-                currentDestination.longitude),
-            12f))
-
         map.setOnMapClickListener { latLng ->
-            val newDestination = Destination(System.nanoTime(), latitude = latLng.latitude, longitude = latLng.longitude, radius = circle.radius)
-            Log.d(TAG, newDestination.toString())
-
-            db().destinationDao().insertDestination(newDestination)
-
-            currentDestination = db().destinationDao().getDestination()!! // TODO This is dangerous
-            currentLatLng = LatLng(currentDestination.latitude, currentDestination.longitude)
-            currentRadius = circle.radius
-
-            Log.d(TAG, currentDestination.toString())
-            Toast.makeText(this, "latitude: ${latLng.latitude}, longitude: ${latLng.longitude}", Toast.LENGTH_SHORT).show()
-
+            destination.position = latLng
+            updateDestination()
             updateMap()
         }
     }
+
+    private fun updateDestination() {
+        val newDestination = Destination(System.nanoTime(), position = destination.position, radius = circle.radius)
+        db().destinationDao().insertDestination(newDestination)
+    }
+
 
     private fun updateMap() {
         map.clear()
 
         // Add a marker
         marker = map.addMarker(MarkerOptions()
-                .position(currentLatLng)
+                .position(destination.position)
                 .title(getString(R.string.destination)))
 
         circle = map.addCircle(CircleOptions()
-                .center(currentLatLng)
-                .radius(currentRadius)
+                .center(destination.position)
+                .radius(destination.radius)
                 .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
+
+        if (firstRun) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(destination.position, 12f))
+            firstRun = false
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
