@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import pl.baftek.buswakeup.DATABASE_NAME
 import pl.baftek.buswakeup.DEFAULT_POSITION
 import pl.baftek.buswakeup.DEFAULT_RADIUS
 
 @Database(entities = [Destination::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun destinationDao(): DestinationDao
