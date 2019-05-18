@@ -42,7 +42,7 @@ class LocationService : Service() {
         if(userLocation == null) return@Observer
 
         /** Won't be null (look at [AppDatabase.populateInitialData]**/
-        val destination = db().destinationDao().getDestination() as Destination
+        val destination = db().destinationDao().getDestinationSync()
         Log.d(TAG, destination.toString())
 
         val distance = userLocation.distanceFrom(destination.position)
