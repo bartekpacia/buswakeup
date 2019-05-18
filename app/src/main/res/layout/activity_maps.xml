@@ -50,26 +50,30 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp" />
 
-    <Button
-        android:id="@+id/buttonLess"
-        android:text="-"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:insetTop="6dp"
-        android:insetBottom="6dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonMore" />
-
-    <Button
+    <ImageButton
         android:id="@+id/buttonMore"
-        android:text="+"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="24dp"
+        app:srcCompat="@drawable/ic_more_24dp"
+        app:layout_constraintEnd_toEndOf="@+id/map"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/map" />
+        android:backgroundTint="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/buttonLess" />
+
+    <ImageButton
+        android:id="@+id/buttonLess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        app:srcCompat="@drawable/ic_less_24dp"
+        app:layout_constraintEnd_toEndOf="@+id/map"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        android:backgroundTint="@color/colorAccent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
