@@ -50,9 +50,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
 
         db().destinationDao().getDestination().observe(this, Observer<Destination> {
-            toast("observed db update")
-            Log.d(TAG, "observed db update")
-
             destination = it
             updateMap()
         })
@@ -84,9 +81,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setOnMapClickListener { latLng ->
             destination.position = latLng
             updateDestination()
-
-            Log.d(TAG, "Current destination: $destination")
-
             updateMap()
         }
     }
