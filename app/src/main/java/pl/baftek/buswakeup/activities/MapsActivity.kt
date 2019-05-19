@@ -50,9 +50,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
 
         db().destinationDao().getDestination().observe(this, Observer<Destination> {
-            toast("observed db update")
-            Log.d(TAG, "observed db update")
-
             destination = it
             updateMap()
         })
@@ -67,20 +64,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    private fun handlePermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), RC_PERMISSION_LOCATION)
+            }
+        } else {
+            map.isMyLocationEnabled = true
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         handlePermissions()
 
         map.setOnMapClickListener { latLng ->
-            marker.position = latLng
+            destination.position = latLng
             updateDestination()
+            updateMap()
         }
     }
 
     private fun updateDestination() {
-        val newDestination = Destination(System.nanoTime(), position = marker.position, radius = circle.radius)
+        val newDestination = Destination(System.nanoTime(), position = destination.position, radius = circle.radius)
         db().destinationDao().insertDestination(newDestination)
     }
+
 
     private fun updateMap() {
         map.clear()
@@ -99,16 +108,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (firstRun) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(destination.position, 12f))
             firstRun = false
-        }
-    }
-
-    private fun handlePermissions() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), RC_PERMISSION_LOCATION)
-            }
-        } else {
-            map.isMyLocationEnabled = true
         }
     }
 
