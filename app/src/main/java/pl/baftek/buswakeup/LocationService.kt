@@ -38,7 +38,7 @@ class LocationService : Service() {
         if(userLocation == null) return@Observer
         
         val destination = db().destinationDao().getDestinationSync()
-        val distance = userLocation.distanceFrom(destination.position)
+        val distance = userLocation.distanceFrom(destination!!.position)
         val distanceKm = distance.toFloat() / 1000
 
         val toastText = if (distance < destination.radius) {
