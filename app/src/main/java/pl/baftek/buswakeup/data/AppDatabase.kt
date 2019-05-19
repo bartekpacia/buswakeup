@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
             if (instance == null) {
                 instance = buildDatabase(context)
             }
-            if ((instance as AppDatabase).destinationDao().getDestination() == null) {
+            if ((instance as AppDatabase).destinationDao().getDestinationSync() == null) {
                 (instance as AppDatabase).populateInitialData()
             }
             return instance as AppDatabase
@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
     private fun populateInitialData() {
-        if (this.destinationDao().getDestination() == null) {
+        if (this.destinationDao().getDestinationSync() == null) {
             val destination = Destination(System.nanoTime(), DEFAULT_POSITION, radius = DEFAULT_RADIUS)
 
             this.destinationDao().insertDestination(destination)

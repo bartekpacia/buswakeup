@@ -10,7 +10,7 @@ import androidx.room.Query
 interface DestinationDao {
 
     @Query("SELECT * FROM destinations WHERE timestamp = (SELECT MAX(timestamp) FROM destinations)")
-    fun getDestinationSync(): Destination
+    fun getDestinationSync(): Destination?
 
     // Get the newest destination
     @Query("SELECT * FROM destinations WHERE timestamp = (SELECT MAX(timestamp) FROM destinations)")
