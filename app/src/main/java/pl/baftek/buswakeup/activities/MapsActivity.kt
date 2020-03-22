@@ -5,14 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
@@ -22,13 +24,13 @@ import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.main.activity_maps.*
-import org.jetbrains.anko.toast
 import pl.baftek.buswakeup.BuildConfig
 import pl.baftek.buswakeup.LocationService
 import pl.baftek.buswakeup.R
+import pl.baftek.buswakeup.activities.MapsActivityViewModel.RadiusStatus
+import pl.baftek.buswakeup.activities.MapsActivityViewModel.RadiusStatus.*
 import pl.baftek.buswakeup.data.Destination
-import pl.baftek.buswakeup.dsl.db
+import pl.baftek.buswakeup.databinding.ActivityMapsBinding
 
 private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
@@ -44,30 +46,62 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var circle: Circle
 
     private var firstRun = true
+    private val model: MapsActivityViewModel by viewModels()
+    private lateinit var binding: ActivityMapsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
+        binding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        db().destinationDao().getDestination().observe(this, Observer<Destination> {
+        model.getDestination().observe(this) {
             destination = it
             updateMap()
-        })
+        }
 
         val serviceIntent = Intent(this, LocationService::class.java)
-        buttonService.setOnClickListener { startService(serviceIntent) }
-        buttonLess.setOnClickListener { if (circle.radius >= 50) circle.radius -= 10; updateDestination() }
-        buttonMore.setOnClickListener { circle.radius += 10; updateDestination() }
-        textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
+        binding.buttonStart.setOnClickListener { startService(serviceIntent) }
+        binding.textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
+
+        binding.buttonLess.setOnTouchListener { _: View, event: MotionEvent ->
+            if (event.action == MotionEvent.ACTION_DOWN) model.radius.value = DECREASING
+            if (event.action == MotionEvent.ACTION_UP) model.radius.value = IDLE
+            true
+        }
+
+        binding.buttonMore.setOnTouchListener { _: View, event: MotionEvent ->
+            if (event.action == MotionEvent.ACTION_DOWN) model.radius.value = INCREASING
+            if (event.action == MotionEvent.ACTION_UP) model.radius.value = IDLE
+            true
+        }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        model.radius.observe(this) { radiusStatus: RadiusStatus? ->
+            if (radiusStatus == DECREASING) {
+                if (circle.radius >= 50) circle.radius -= 10
+                updateDestination()
+            }
+
+            if (radiusStatus == INCREASING) {
+                if (circle.radius >= 50) circle.radius += 10
+                updateDestination()
+            }
+        }
     }
 
     private fun handlePermissions() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), RC_PERMISSION_LOCATION)
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    RC_PERMISSION_LOCATION
+                )
             }
         } else {
             map.isMyLocationEnabled = true
@@ -86,24 +120,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updateDestination() {
-        val newDestination = Destination(System.nanoTime(), position = destination.position, radius = circle.radius)
-        db().destinationDao().insertDestination(newDestination)
-    }
+        val newDestination =
+            Destination(System.nanoTime(), position = destination.position, radius = circle.radius)
 
+        model.setDestination(newDestination)
+    }
 
     private fun updateMap() {
         map.clear()
 
         // Add a marker
-        marker = map.addMarker(MarkerOptions()
+        marker = map.addMarker(
+            MarkerOptions()
                 .position(destination.position)
-                .title(getString(R.string.destination)))
+                .title(getString(R.string.destination))
+        )
 
-        circle = map.addCircle(CircleOptions()
+        circle = map.addCircle(
+            CircleOptions()
                 .center(destination.position)
                 .radius(destination.radius)
                 .fillColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark)))
+                .strokeColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        )
 
         if (firstRun) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(destination.position, 12f))
@@ -111,7 +150,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == RC_PERMISSION_LOCATION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {

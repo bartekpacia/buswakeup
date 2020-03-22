@@ -19,7 +19,6 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import pl.baftek.buswakeup.activities.MapsActivity
 import pl.baftek.buswakeup.data.AppDatabase
-import pl.baftek.buswakeup.dsl.db
 import pl.baftek.buswakeup.dsl.distanceFrom
 
 private const val TAG = "LocationService"
@@ -35,9 +34,9 @@ class LocationService : Service() {
     private lateinit var mediaPlayer: MediaPlayer
 
     private val observer = Observer<Location> { userLocation ->
-        if(userLocation == null) return@Observer
-        
-        val destination = db().destinationDao().getDestinationSync()
+        if (userLocation == null) return@Observer
+
+        val destination = AppDatabase.getInstance(this).destinationDao().getDestinationSync()
         val distance = userLocation.distanceFrom(destination!!.position)
         val distanceKm = distance.toFloat() / 1000
 
@@ -66,7 +65,9 @@ class LocationService : Service() {
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         mediaPlayer = MediaPlayer()
-        mediaPlayer.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
+        mediaPlayer.setAudioAttributes(
+            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
+        )
         mediaPlayer.setDataSource(this, ringtoneUri)
         mediaPlayer.prepare()
 
@@ -78,7 +79,13 @@ class LocationService : Service() {
 
         CurrentLocationListener.getInstance(applicationContext).observeForever(observer)
 
-        startForeground(notificationId, buildNotification(title = getString(R.string.location_tracking), text = getString(R.string.waiting_for_location)))
+        startForeground(
+            notificationId,
+            buildNotification(
+                title = getString(R.string.location_tracking),
+                text = getString(R.string.waiting_for_location)
+            )
+        )
 
         return START_STICKY
     }
@@ -90,19 +97,24 @@ class LocationService : Service() {
         cancelIntent.action = ACTION_STOP_SERVICE
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(PendingIntent.getActivity(this, 0, notificationIntent, 0))
-                .addAction(R.drawable.ic_my_location_24dp, getString(R.string.turn_off), PendingIntent.getService(this, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT))
-                .setSmallIcon(R.drawable.ic_my_location_24dp)
-                .setColorized(true)
-                .setColor(resources.getColor(R.color.colorPrimary))
-                .build()
+            .setContentTitle(title)
+            .setContentText(text)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(PendingIntent.getActivity(this, 0, notificationIntent, 0))
+            .addAction(
+                R.drawable.ic_my_location_24dp,
+                getString(R.string.turn_off),
+                PendingIntent.getService(this, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            )
+            .setSmallIcon(R.drawable.ic_my_location_24dp)
+            .setColorized(true)
+            .setColor(resources.getColor(R.color.colorPrimary))
+            .build()
     }
 
     override fun onDestroy() {
-        CurrentLocationListener.getInstance(applicationContext).removeObserver(observer) // Maybe observers aren't 'deactivated'?
+        CurrentLocationListener.getInstance(applicationContext)
+            .removeObserver(observer) // Maybe observers aren't 'deactivated'?
         mediaPlayer.stop()
         vibrator.cancel()
         Log.d(TAG, "Service destroyed")
