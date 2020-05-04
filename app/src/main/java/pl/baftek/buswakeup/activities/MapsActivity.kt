@@ -99,7 +99,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    ),
                     RC_PERMISSION_LOCATION
                 )
             }
