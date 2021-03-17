@@ -14,7 +14,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.observe
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
@@ -32,7 +31,6 @@ import pl.baftek.buswakeup.activities.MapsActivityViewModel.RadiusStatus.*
 import pl.baftek.buswakeup.data.Destination
 import pl.baftek.buswakeup.databinding.ActivityMapsBinding
 
-private const val TAG = "MapsActivityLog"
 private const val RC_PERMISSION_LOCATION = 9001
 
 @SuppressWarnings("MissingPermission")
@@ -63,13 +61,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.buttonStart.setOnClickListener { startService(serviceIntent) }
         binding.textVersion.text = "${getString(R.string.version)} ${BuildConfig.VERSION_NAME}"
 
-        binding.buttonLess.setOnTouchListener { _: View, event: MotionEvent ->
+        binding.buttonLess.setOnTouchListener { view: View, event: MotionEvent ->
+            view.performClick()
             if (event.action == MotionEvent.ACTION_DOWN) model.radius.value = DECREASING
             if (event.action == MotionEvent.ACTION_UP) model.radius.value = IDLE
             true
         }
 
-        binding.buttonMore.setOnTouchListener { _: View, event: MotionEvent ->
+        binding.buttonMore.setOnTouchListener { view: View, event: MotionEvent ->
+            view.performClick()
             if (event.action == MotionEvent.ACTION_DOWN) model.radius.value = INCREASING
             if (event.action == MotionEvent.ACTION_UP) model.radius.value = IDLE
             true
